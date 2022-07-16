@@ -1,16 +1,34 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+from bs4 import BeautifulSoup
+import requests
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def get_citations_needed_count(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, "html.parser")
+    results = soup.find(class_="vector-body")
+    ptags = results.find_all("p")
+    output = 0
+    for ptag in ptags:
+        tag_content = ptag.text
+        if "citation needed" in tag_content:
+            output += 1
+    return output
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def get_citations_needed_report(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, "html.parser")
+    results = soup.find(class_="vector-body")
+    ptags = results.find_all("p")
+    output = ""
+    for ptag in ptags:
+        tag_content = ptag.text
+        if "citation needed" in tag_content:
+            output += tag_content
+            output += "\n\n"
+    return output
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+URL = "https://en.wikipedia.org/wiki/Tenet_(film)"
+print(get_citations_needed_count(URL))
+print(get_citations_needed_report(URL))
